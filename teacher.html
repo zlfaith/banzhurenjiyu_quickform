@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班主任寄语管理系统 - 教师端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #4facfe;
+            border-bottom-color: #4facfe;
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        .tab:hover {
+            background: #f8f9fa;
+        }
+
+        .tab-content {
+            padding: 24px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-content {
+            padding: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 180px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(238, 90, 90, 0.4);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .status-message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .sample-messages {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .sample-messages h4 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .sample-messages ul {
+            list-style: none;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.8;
+        }
+
+        .sample-messages li::before {
+            content: "•";
+            color: #4facfe;
+            margin-right: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .data-content {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-buttons {
+            margin-top: 24px;
+            text-align: right;
+        }
+
+        .btn-block {
+            width: 100%;
+            margin-left: 0;
+            margin-bottom: 10px;
+        }
+
+        .refresh-btn {
+            float: right;
+            margin-bottom: 16px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e0e0e0;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4facfe;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(79, 172, 254, 0.4);
+        }
+
+        .slider-container input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #4facfe;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(79, 172, 254, 0.4);
+        }
+
+        .slider-value {
+            background: #4facfe;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 25px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            gap: 8px;
+        }
+
+        .radio-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4facfe;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 12px;
+            }
+
+            .header {
+                padding: 18px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .tab-content {
+                padding: 16px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .btn {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            .btn-small {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>班主任寄语管理系统</h1>
+            <p>教师端 - 设置寄语内容</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('submit')">提交数据</div>
+            <div class="tab" onclick="showTab('query')">查询管理</div>
+        </div>
+
+        <div class="tab-content active" id="submit">
+            <form id="messageForm">
+                <div class="form-group">
+                    <label for="messages">班主任寄语</label>
+                    <textarea id="messages" name="messages" placeholder="请输入班主任寄语，每行一条..."></textarea>
+                    <div class="hint">提示：每行一条寄语，系统会根据星期几自动显示对应的寄语</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="countdownName">倒计时名称</label>
+                    <input type="text" id="countdownName" name="countdownName" placeholder="例如：生物地理结业考试">
+                </div>
+
+                <div class="form-group">
+                    <label for="targetDate">目标日期</label>
+                    <input type="date" id="targetDate" name="targetDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="fontSize">寄语字号</label>
+                    <div class="slider-container">
+                        <input type="range" id="fontSize" name="fontSize" min="12" max="50" value="30" step="1">
+                        <span id="fontSizeValue" class="slider-value">30</span>
+                    </div>
+                    <div class="hint">提示：拖动滑块调整寄语文字大小</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="countdownFontSize">倒计时字号</label>
+                    <div class="slider-container">
+                        <input type="range" id="countdownFontSize" name="countdownFontSize" min="12" max="50" value="30" step="1">
+                        <span id="countdownFontSizeValue" class="slider-value">30</span>
+                    </div>
+                    <div class="hint">提示：拖动滑块调整倒计时文字大小</div>
+                </div>
+
+                <div class="form-group">
+                    <label>对齐方式</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="textAlignment" value="Left">
+                            <span>左对齐</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="textAlignment" value="Center" checked>
+                            <span>居中</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="textAlignment" value="Right">
+                            <span>右对齐</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">提交设置</button>
+                <button type="button" class="btn btn-secondary btn-block" onclick="loadDefaultData()">加载示例数据</button>
+            </form>
+
+            <div id="submitStatus" class="status-message"></div>
+
+            <div class="sample-messages">
+                <h4>示例寄语参考：</h4>
+                <ul>
+                    <li>把每一件小事做好，把每一个知识点扎实，优秀自然会来找你。</li>
+                    <li>青春没有捷径，每一步努力，都在为未来铺路。</li>
+                    <li>愿你眼里有光，心中有爱，脚下有路。</li>
+                    <li>不怕起点低，就怕不努力；不怕暂时落后，就怕轻言放弃。</li>
+                    <li>课堂认真一分，收获多十分；自律多一点，成长快一步。</li>
+                    <li>心怀梦想，脚踏实地，在最好的年纪，做最努力的自己。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="query">
+            <button class="btn btn-secondary refresh-btn" onclick="loadData()">刷新数据</button>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>提交时间</th>
+                        <th>倒计时名称</th>
+                        <th>目标日期</th>
+                        <th>寄语字号</th>
+                        <th>倒计时字号</th>
+                        <th>对齐方式</th>
+                        <th>寄语预览</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                </tbody>
+            </table>
+            <div id="queryStatus" class="status-message"></div>
+        </div>
+    </div>
+
+    
+
+    <script>
+        const API_URL = 'https://quickform.cn/api/qvh8vbxcnt';
+
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const messages = document.getElementById('messages').value;
+            const countdownName = document.getElementById('countdownName').value;
+            const targetDate = document.getElementById('targetDate').value;
+
+            if (!messages.trim()) {
+                showStatus('submitStatus', '请输入班主任寄语', 'error');
+                return;
+            }
+
+            if (!countdownName.trim()) {
+                showStatus('submitStatus', '请输入倒计时名称', 'error');
+                return;
+            }
+
+            if (!targetDate) {
+                showStatus('submitStatus', '请选择目标日期', 'error');
+                return;
+            }
+
+            const fontSize = document.getElementById('fontSize').value;
+            const countdownFontSize = document.getElementById('countdownFontSize').value;
+            const textAlignment = document.querySelector('input[name="textAlignment"]:checked').value;
+
+            const data = {
+                messages: messages,
+                countdownName: countdownName,
+                targetDate: targetDate,
+                fontSize: fontSize,
+                countdownFontSize: countdownFontSize,
+                textAlignment: textAlignment,
+                submitTime: new Date().toISOString()
+            };
+
+            submitData(data);
+        });
+
+        document.getElementById('fontSize').addEventListener('input', function(e) {
+            document.getElementById('fontSizeValue').textContent = e.target.value;
+        });
+
+        document.getElementById('countdownFontSize').addEventListener('input', function(e) {
+            document.getElementById('countdownFontSizeValue').textContent = e.target.value;
+        });
+
+        function submitData(data) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showStatus('submitStatus', '设置提交成功！桌面软件将自动同步更新。', 'success');
+                    document.getElementById('messageForm').reset();
+                } else {
+                    showStatus('submitStatus', '提交失败，请稍后重试', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatus('submitStatus', '提交失败，请检查网络连接', 'error');
+            });
+        }
+
+        function loadData() {
+            fetch(API_URL + '/all')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.submissions && Array.isArray(data.submissions)) {
+                    data.submissions.sort((a, b) => new Date(b.submitTime) - new Date(a.submitTime));
+                    renderTable(data.submissions);
+                } else if (Array.isArray(data) && data.length > 0) {
+                    data.sort((a, b) => new Date(b.submitTime) - new Date(a.submitTime));
+                    renderTable(data);
+                } else {
+                    document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="8" class="no-data">暂无数据</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatus('queryStatus', '加载数据失败', 'error');
+            });
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                const preview = item.messages ? item.messages.substring(0, 30) + (item.messages.length > 30 ? '...' : '') : '';
+                const time = new Date(item.submitTime).toLocaleString('zh-CN');
+                const alignmentText = getAlignmentText(item.textAlignment);
+                
+                row.innerHTML = `
+                    <td>${item.id || '-'}</td>
+                    <td>${time}</td>
+                    <td>${item.countdownName || '-'}</td>
+                    <td>${item.targetDate || '-'}</td>
+                    <td>${item.fontSize || '18'}</td>
+                    <td>${item.countdownFontSize || '20'}</td>
+                    <td>${alignmentText}</td>
+                    <td class="data-content" title="${item.messages || ''}">${preview}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function getAlignmentText(alignment) {
+            switch (alignment) {
+                case 'Left':
+                    return '左对齐';
+                case 'Center':
+                    return '居中';
+                case 'Right':
+                    return '右对齐';
+                default:
+                    return '左对齐';
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab:nth-child(${tabName === 'submit' ? 1 : 2})`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'query') {
+                loadData();
+            }
+        }
+
+        function loadDefaultData() {
+            const defaultMessages = `把每一件小事做好，把每一个知识点扎实，优秀自然会来找你。
+青春没有捷径，每一步努力，都在为未来铺路。
+愿你眼里有光，心中有爱，脚下有路，做温暖而坚定的少年。
+不怕起点低，就怕不努力；不怕暂时落后，就怕轻言放弃。
+课堂认真一分，收获多十分；自律多一点，成长快一步。
+心怀梦想，脚踏实地，在最好的年纪，做最努力的自己。`;
+
+            document.getElementById('messages').value = defaultMessages;
+            document.getElementById('countdownName').value = '生物地理结业考试';
+            document.getElementById('targetDate').value = '2026-06-15';
+            document.getElementById('fontSize').value = '30';
+            document.getElementById('fontSizeValue').textContent = '30';
+            document.getElementById('countdownFontSize').value = '30';
+            document.getElementById('countdownFontSizeValue').textContent = '30';
+            document.querySelector('input[name="textAlignment"][value="Center"]').checked = true;
+            showStatus('submitStatus', '已加载示例数据', 'success');
+        }
+
+        function showStatus(elementId, message, type) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.className = 'status-message';
+            
+            if (type === 'success') {
+                statusElement.classList.add('status-success');
+            } else {
+                statusElement.classList.add('status-error');
+            }
+
+            setTimeout(() => {
+                statusElement.className = 'status-message';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('targetDate').min = today;
+            document.getElementById('editTargetDate').min = today;
+        });
+
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

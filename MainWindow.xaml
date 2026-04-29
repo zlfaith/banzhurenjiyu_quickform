@@ -1,0 +1,115 @@
+<Window x:Class="DesktopMessageApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DesktopMessageApp"
+        mc:Ignorable="d"
+        Title="班主任寄语与倒计时"
+        Height="350"
+        Width="600"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        MouseDown="Window_MouseDown"
+        ResizeMode="CanResizeWithGrip">
+    <Grid>
+        <!-- 半透明背景 -->
+        <Border CornerRadius="15" Opacity="0.9">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF2C3E50" Offset="0"/>
+                    <GradientStop Color="#FF34495E" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        
+        <!-- 装饰元素 -->
+        <Border Width="10" Height="100" CornerRadius="5" HorizontalAlignment="Left" Margin="10,20,0,0" Opacity="0.8">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#FF3498DB" Offset="0"/>
+                    <GradientStop Color="#FF2ECC71" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        
+        <!-- 内容容器 -->
+        <StackPanel Margin="30">
+            <!-- 寄语区域 -->
+            <StackPanel>
+                <TextBlock Text="班主任寄语" FontSize="16" FontWeight="SemiBold" Foreground="#FF3498DB" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <Border Background="#FF34495E" CornerRadius="10" Padding="15" Margin="0,0,0,20">
+                    <TextBlock x:Name="MessageTextBlock" Text="默认寄语：努力学习，天天向上！" FontSize="18" Foreground="#FFFFEB3B" TextWrapping="Wrap" LineHeight="24">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="3" Color="#FF000000" Opacity="0.4"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+            
+            <!-- 倒计时区域 -->
+            <StackPanel>
+                <TextBlock Text="倒计时" FontSize="16" FontWeight="SemiBold" Foreground="#FF2ECC71" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <Border Background="#FF34495E" CornerRadius="10" Padding="15" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock x:Name="CountdownTextBlock" Text="距离目标日期还有 0 天" FontSize="28" FontWeight="Bold" Foreground="#FF2ECC71" HorizontalAlignment="Center" Margin="0,0,0,10">
+                            <TextBlock.Effect>
+                                <DropShadowEffect BlurRadius="3" Color="#FF000000" Opacity="0.3"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
+                        <TextBlock x:Name="TargetDateTextBlock" Text="目标日期：未设置" FontSize="14" Foreground="#FF95A5A6" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            
+            <!-- 按钮容器 -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button x:Name="SettingsButton" Content="设置" Click="SettingsButton_Click" Width="100" Height="36" FontSize="14" FontWeight="SemiBold">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" Background="#FF3498DB" CornerRadius="8" Padding="0" SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FF2980B9"/>
+                                    <Setter TargetName="border" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="5" Color="#FF000000" Opacity="0.3"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Button.Effect>
+                        <DropShadowEffect BlurRadius="3" Color="#FF000000" Opacity="0.2"/>
+                    </Button.Effect>
+                </Button>
+                <Button x:Name="CloseButton" Content="关闭" Click="CloseButton_Click" Width="100" Height="36" FontSize="14" FontWeight="SemiBold" Margin="15,0,0,0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" Background="#FFE74C3C" CornerRadius="8" Padding="0" SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#FFC0392B"/>
+                                    <Setter TargetName="border" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="5" Color="#FF000000" Opacity="0.3"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Button.Effect>
+                        <DropShadowEffect BlurRadius="3" Color="#FF000000" Opacity="0.2"/>
+                    </Button.Effect>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
