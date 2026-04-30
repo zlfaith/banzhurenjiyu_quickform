@@ -12,9 +12,15 @@ namespace DesktopMessageApp
         public string CountdownName { get; set; }
         public new double FontSize { get; set; }
         public double CountdownFontSize { get; set; }
+        public double RemarkFontSize { get; set; }
         public string TextAlignment { get; set; }
+        public string Remark { get; set; }
+        public bool UseQuickForm { get; set; }
+        public bool ShowMessage { get; set; }
+        public bool ShowCountdown { get; set; }
+        public bool ShowRemark { get; set; }
 
-        public SettingsWindow(List<string> currentMessages, DateTime currentTargetDate, string currentCountdownName, double currentFontSize, double currentCountdownFontSize, string currentTextAlignment)
+        public SettingsWindow(List<string> currentMessages, DateTime currentTargetDate, string currentCountdownName, double currentFontSize, double currentCountdownFontSize, double currentRemarkFontSize, string currentTextAlignment, string currentRemark, bool currentUseQuickForm, bool currentShowMessage, bool currentShowCountdown, bool currentShowRemark)
         {
             InitializeComponent();
             Messages = currentMessages ?? new List<string>();
@@ -22,13 +28,30 @@ namespace DesktopMessageApp
             CountdownName = currentCountdownName ?? "目标日期";
             FontSize = currentFontSize > 0 ? currentFontSize : 18;
             CountdownFontSize = currentCountdownFontSize > 0 ? currentCountdownFontSize : 20;
+            RemarkFontSize = currentRemarkFontSize > 0 ? currentRemarkFontSize : 16;
             TextAlignment = currentTextAlignment ?? "Left";
+            Remark = currentRemark ?? string.Empty;
+            UseQuickForm = currentUseQuickForm;
+            ShowMessage = currentShowMessage;
+            ShowCountdown = currentShowCountdown;
+            ShowRemark = currentShowRemark;
+            
             MessageTextBox.Text = string.Join(Environment.NewLine, Messages);
             CountdownNameTextBox.Text = CountdownName;
             FontSizeSlider.Value = FontSize;
             FontSizeValueText.Text = FontSize.ToString();
             CountdownFontSizeSlider.Value = CountdownFontSize;
             CountdownFontSizeValueText.Text = CountdownFontSize.ToString();
+            RemarkTextBox.Text = Remark;
+            RemarkFontSizeSlider.Value = RemarkFontSize;
+            RemarkFontSizeValueText.Text = RemarkFontSize.ToString();
+            
+            QuickFormRadio.IsChecked = UseQuickForm;
+            LocalRadio.IsChecked = !UseQuickForm;
+            
+            ShowMessageCheckBox.IsChecked = ShowMessage;
+            ShowCountdownCheckBox.IsChecked = ShowCountdown;
+            ShowRemarkCheckBox.IsChecked = ShowRemark;
             
             switch (TextAlignment)
             {
@@ -50,6 +73,7 @@ namespace DesktopMessageApp
             
             FontSizeSlider.ValueChanged += (s, e) => FontSizeValueText.Text = FontSizeSlider.Value.ToString();
             CountdownFontSizeSlider.ValueChanged += (s, e) => CountdownFontSizeValueText.Text = CountdownFontSizeSlider.Value.ToString();
+            RemarkFontSizeSlider.ValueChanged += (s, e) => RemarkFontSizeValueText.Text = RemarkFontSizeSlider.Value.ToString();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -63,6 +87,12 @@ namespace DesktopMessageApp
             }
             FontSize = FontSizeSlider.Value;
             CountdownFontSize = CountdownFontSizeSlider.Value;
+            RemarkFontSize = RemarkFontSizeSlider.Value;
+            Remark = RemarkTextBox.Text.Trim();
+            UseQuickForm = QuickFormRadio.IsChecked == true;
+            ShowMessage = ShowMessageCheckBox.IsChecked == true;
+            ShowCountdown = ShowCountdownCheckBox.IsChecked == true;
+            ShowRemark = ShowRemarkCheckBox.IsChecked == true;
             
             if (CenterAlignRadio.IsChecked == true)
             {

@@ -490,6 +490,21 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="remark">备注</label>
+                    <textarea id="remark" name="remark" placeholder="请输入备注内容，例如：其他要求..."></textarea>
+                    <div class="hint">提示：备注内容会显示在学生端桌面软件上</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="remarkFontSize">备注字号</label>
+                    <div class="slider-container">
+                        <input type="range" id="remarkFontSize" name="remarkFontSize" min="12" max="50" value="16" step="1">
+                        <span id="remarkFontSizeValue" class="slider-value">16</span>
+                    </div>
+                    <div class="hint">提示：拖动滑块调整备注文字大小</div>
+                </div>
+
                 <button type="submit" class="btn btn-primary btn-block">提交设置</button>
                 <button type="button" class="btn btn-secondary btn-block" onclick="loadDefaultData()">加载示例数据</button>
             </form>
@@ -520,8 +535,10 @@
                         <th>目标日期</th>
                         <th>寄语字号</th>
                         <th>倒计时字号</th>
+                        <th>备注字号</th>
                         <th>对齐方式</th>
                         <th>寄语预览</th>
+                        <th>备注预览</th>
                     </tr>
                 </thead>
                 <tbody id="dataTableBody">
@@ -560,7 +577,9 @@
 
             const fontSize = document.getElementById('fontSize').value;
             const countdownFontSize = document.getElementById('countdownFontSize').value;
+            const remarkFontSize = document.getElementById('remarkFontSize').value;
             const textAlignment = document.querySelector('input[name="textAlignment"]:checked').value;
+            const remark = document.getElementById('remark').value;
 
             const data = {
                 messages: messages,
@@ -568,7 +587,9 @@
                 targetDate: targetDate,
                 fontSize: fontSize,
                 countdownFontSize: countdownFontSize,
+                remarkFontSize: remarkFontSize,
                 textAlignment: textAlignment,
+                remark: remark,
                 submitTime: new Date().toISOString()
             };
 
@@ -581,6 +602,10 @@
 
         document.getElementById('countdownFontSize').addEventListener('input', function(e) {
             document.getElementById('countdownFontSizeValue').textContent = e.target.value;
+        });
+
+        document.getElementById('remarkFontSize').addEventListener('input', function(e) {
+            document.getElementById('remarkFontSizeValue').textContent = e.target.value;
         });
 
         function submitData(data) {
@@ -616,7 +641,7 @@
                     data.sort((a, b) => new Date(b.submitTime) - new Date(a.submitTime));
                     renderTable(data);
                 } else {
-                    document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="8" class="no-data">暂无数据</td></tr>';
+                    document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="10" class="no-data">暂无数据</td></tr>';
                 }
             })
             .catch(error => {
@@ -632,6 +657,7 @@
             data.forEach(item => {
                 const row = document.createElement('tr');
                 const preview = item.messages ? item.messages.substring(0, 30) + (item.messages.length > 30 ? '...' : '') : '';
+                const remarkPreview = item.remark ? item.remark.substring(0, 30) + (item.remark.length > 30 ? '...' : '') : '';
                 const time = new Date(item.submitTime).toLocaleString('zh-CN');
                 const alignmentText = getAlignmentText(item.textAlignment);
                 
@@ -642,8 +668,10 @@
                     <td>${item.targetDate || '-'}</td>
                     <td>${item.fontSize || '18'}</td>
                     <td>${item.countdownFontSize || '20'}</td>
+                    <td>${item.remarkFontSize || '16'}</td>
                     <td>${alignmentText}</td>
                     <td class="data-content" title="${item.messages || ''}">${preview}</td>
+                    <td class="data-content" title="${item.remark || ''}">${remarkPreview}</td>
                 `;
                 
                 tbody.appendChild(row);

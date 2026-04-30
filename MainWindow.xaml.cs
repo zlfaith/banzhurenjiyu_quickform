@@ -7,20 +7,16 @@ using System.Windows.Threading;
 using System.Threading.Tasks;
 using WinForms = System.Windows.Forms;
 using System.Drawing;
+using Newtonsoft.Json;
 
 namespace DesktopMessageApp
 {
     public partial class MainWindow : Window
     {
-        private DateTime targetDate;
-        private List<string> messages;
-        private string countdownName;
-        private double fontSize;
-        private double countdownFontSize;
-        private string textAlignment;
+        private AppConfig config;
         private DispatcherTimer timer;
         private DispatcherTimer updateCheckTimer;
-        private string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "班主任寄语与倒计时", "config.txt");
+        private string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "班主任寄语与倒计时", "config.json");
         private QuickFormClient quickFormClient;
         private const string ApiUrl = "https://quickform.cn/api/qvh8vbxcnt";
         private WinForms.NotifyIcon notifyIcon;
@@ -28,17 +24,15 @@ namespace DesktopMessageApp
         public MainWindow()
         {
             InitializeComponent();
-            messages = new List<string>();
-            countdownName = "目标日期";
-            fontSize = 18;
-            countdownFontSize = 20;
-            textAlignment = "Left";
+            config = new AppConfig();
             quickFormClient = new QuickFormClient(ApiUrl, configPath);
             LoadConfig();
             StartTimer();
             StartUpdateCheckTimer();
             UpdateCountdown();
             UpdateMessage();
+            UpdateRemark();
+            UpdatePanelVisibility();
             CheckForUpdatesAsync();
             
             this.ShowInTaskbar = false;
@@ -104,6 +98,7 @@ namespace DesktopMessageApp
             {
                 UpdateCountdown();
                 UpdateMessage();
+                UpdateRemark();
             };
             timer.Start();
         }
@@ -114,7 +109,10 @@ namespace DesktopMessageApp
             updateCheckTimer.Interval = TimeSpan.FromMinutes(5);
             updateCheckTimer.Tick += async (sender, e) =>
             {
-                await CheckForUpdatesAsync();
+                if (config.UseQuickForm)
+                {
+                    await CheckForUpdatesAsync();
+                }
             };
             updateCheckTimer.Start();
         }
@@ -129,6 +127,8 @@ namespace DesktopMessageApp
                     LoadConfig();
                     UpdateMessage();
                     UpdateCountdown();
+                    UpdateRemark();
+                    UpdatePanelVisibility();
                 }
             }
             catch
@@ -138,24 +138,24 @@ namespace DesktopMessageApp
 
         private void UpdateCountdown()
         {
-            if (targetDate > DateTime.Now)
+            if (config.TargetDate > DateTime.Now)
             {
-                TimeSpan timeLeft = targetDate - DateTime.Now;
-                CountdownTextBlock.Text = $"距离{countdownName}还有 {timeLeft.Days} 天";
-                TargetDateTextBlock.Text = $"{countdownName}：{targetDate.ToString("yyyy年MM月dd日")}";
+                TimeSpan timeLeft = config.TargetDate - DateTime.Now;
+                CountdownTextBlock.Text = $"距离{config.CountdownName}还有 {timeLeft.Days} 天";
+                TargetDateTextBlock.Text = $"{config.CountdownName}：{config.TargetDate.ToString("yyyy年MM月dd日")}";
             }
-            else if (targetDate != default)
+            else if (config.TargetDate != default)
             {
-                CountdownTextBlock.Text = $"{countdownName}已到达！";
-                TargetDateTextBlock.Text = $"{countdownName}：{targetDate.ToString("yyyy年MM月dd日")}";
+                CountdownTextBlock.Text = $"{config.CountdownName}已到达！";
+                TargetDateTextBlock.Text = $"{config.CountdownName}：{config.TargetDate.ToString("yyyy年MM月dd日")}";
             }
-            CountdownTextBlock.FontSize = countdownFontSize;
-            TargetDateTextBlock.FontSize = countdownFontSize * 0.8;
+            CountdownTextBlock.FontSize = config.CountdownFontSize;
+            TargetDateTextBlock.FontSize = config.CountdownFontSize * 0.8;
         }
 
         private void UpdateMessage()
         {
-            if (messages.Count > 0)
+            if (config.Messages.Count > 0)
             {
                 DayOfWeek dayOfWeek = DateTime.Now.DayOfWeek;
                 int index;
@@ -167,15 +167,15 @@ namespace DesktopMessageApp
                 {
                     index = (int)dayOfWeek - 1;
                 }
-                index = index % messages.Count;
-                MessageTextBlock.Text = messages[index];
+                index = index % config.Messages.Count;
+                MessageTextBlock.Text = config.Messages[index];
             }
             else
             {
                 MessageTextBlock.Text = "默认寄语：努力学习，天天向上！";
             }
-            MessageTextBlock.FontSize = fontSize;
-            switch (textAlignment)
+            MessageTextBlock.FontSize = config.FontSize;
+            switch (config.TextAlignment)
             {
                 case "Center":
                     MessageTextBlock.TextAlignment = TextAlignment.Center;
@@ -189,6 +189,26 @@ namespace DesktopMessageApp
             }
         }
 
+        private void UpdateRemark()
+        {
+            if (!string.IsNullOrWhiteSpace(config.Remark))
+            {
+                RemarkTextBlock.Text = config.Remark;
+            }
+            else
+            {
+                RemarkTextBlock.Text = "暂无备注";
+            }
+            RemarkTextBlock.FontSize = config.RemarkFontSize;
+        }
+
+        private void UpdatePanelVisibility()
+        {
+            MessagePanel.Visibility = config.ShowMessage ? Visibility.Visible : Visibility.Collapsed;
+            CountdownPanel.Visibility = config.ShowCountdown ? Visibility.Visible : Visibility.Collapsed;
+            RemarkPanel.Visibility = config.ShowRemark ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -199,18 +219,40 @@ namespace DesktopMessageApp
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            SettingsWindow settingsWindow = new SettingsWindow(messages, targetDate, countdownName, fontSize, countdownFontSize, textAlignment);
+            SettingsWindow settingsWindow = new SettingsWindow(
+                config.Messages, 
+                config.TargetDate, 
+                config.CountdownName, 
+                config.FontSize, 
+                config.CountdownFontSize, 
+                config.RemarkFontSize, 
+                config.TextAlignment, 
+                config.Remark, 
+                config.UseQuickForm,
+                config.ShowMessage,
+                config.ShowCountdown,
+                config.ShowRemark
+            );
             settingsWindow.Owner = this;
             if (settingsWindow.ShowDialog() == true)
             {
-                messages = settingsWindow.Messages;
-                targetDate = settingsWindow.TargetDate;
-                countdownName = settingsWindow.CountdownName;
-                fontSize = settingsWindow.FontSize;
-                countdownFontSize = settingsWindow.CountdownFontSize;
-                textAlignment = settingsWindow.TextAlignment;
+                config.Messages = settingsWindow.Messages;
+                config.TargetDate = settingsWindow.TargetDate;
+                config.CountdownName = settingsWindow.CountdownName;
+                config.FontSize = settingsWindow.FontSize;
+                config.CountdownFontSize = settingsWindow.CountdownFontSize;
+                config.RemarkFontSize = settingsWindow.RemarkFontSize;
+                config.TextAlignment = settingsWindow.TextAlignment;
+                config.Remark = settingsWindow.Remark;
+                config.UseQuickForm = settingsWindow.UseQuickForm;
+                config.ShowMessage = settingsWindow.ShowMessage;
+                config.ShowCountdown = settingsWindow.ShowCountdown;
+                config.ShowRemark = settingsWindow.ShowRemark;
+                
                 UpdateMessage();
                 UpdateCountdown();
+                UpdateRemark();
+                UpdatePanelVisibility();
                 SaveConfig();
             }
         }
@@ -232,75 +274,13 @@ namespace DesktopMessageApp
             {
                 if (File.Exists(configPath))
                 {
-                    messages.Clear();
-                    string[] lines = File.ReadAllLines(configPath);
-                    if (lines.Length > 0)
+                    string json = File.ReadAllText(configPath);
+                    AppConfig? loadedConfig = JsonConvert.DeserializeObject<AppConfig>(json);
+                    if (loadedConfig != null)
                     {
-                        countdownName = lines[0];
-                        
-                        if (lines.Length > 1 && double.TryParse(lines[1], out double size))
-                        {
-                            fontSize = size;
-                            
-                            if (lines.Length > 2 && double.TryParse(lines[2], out double countdownSize))
-                            {
-                                countdownFontSize = countdownSize;
-                                
-                                if (lines.Length > 3)
-                                {
-                                    textAlignment = lines[3];
-                                    for (int i = 4; i < lines.Length - 1; i++)
-                                    {
-                                        messages.Add(lines[i]);
-                                    }
-                                    if (lines.Length > 4 && DateTime.TryParse(lines[lines.Length - 1], out DateTime date))
-                                    {
-                                        targetDate = date;
-                                    }
-                                }
-                                else
-                                {
-                                    if (lines.Length > 2)
-                                    {
-                                        textAlignment = lines[2];
-                                        for (int i = 3; i < lines.Length - 1; i++)
-                                        {
-                                            messages.Add(lines[i]);
-                                        }
-                                        if (lines.Length > 3 && DateTime.TryParse(lines[lines.Length - 1], out DateTime date))
-                                        {
-                                            targetDate = date;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (lines.Length > 2)
-                                {
-                                    textAlignment = lines[2];
-                                    for (int i = 3; i < lines.Length - 1; i++)
-                                    {
-                                        messages.Add(lines[i]);
-                                    }
-                                    if (lines.Length > 3 && DateTime.TryParse(lines[lines.Length - 1], out DateTime date))
-                                    {
-                                        targetDate = date;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 1; i < lines.Length - 1; i++)
-                            {
-                                messages.Add(lines[i]);
-                            }
-                            if (lines.Length > 1 && DateTime.TryParse(lines[lines.Length - 1], out DateTime date))
-                            {
-                                targetDate = date;
-                            }
-                        }
+                        config = loadedConfig;
+                        if (config.Messages == null)
+                            config.Messages = new List<string>();
                     }
                 }
             }
@@ -320,21 +300,8 @@ namespace DesktopMessageApp
                     Directory.CreateDirectory(configDir);
                 }
                 
-                List<string> configLines = new List<string>();
-                configLines.Add(countdownName);
-                configLines.Add(fontSize.ToString());
-                configLines.Add(countdownFontSize.ToString());
-                configLines.Add(textAlignment);
-                configLines.AddRange(messages);
-                configLines.Add(targetDate.ToString());
-                
-                using (StreamWriter writer = new StreamWriter(configPath, false))
-                {
-                    foreach (string line in configLines)
-                    {
-                        writer.WriteLine(line);
-                    }
-                }
+                string json = JsonConvert.SerializeObject(config, Formatting.Indented);
+                File.WriteAllText(configPath, json);
             }
             catch (Exception ex)
             {

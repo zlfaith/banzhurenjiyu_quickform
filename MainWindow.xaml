@@ -37,7 +37,7 @@
         <!-- 内容容器 -->
         <StackPanel Margin="30">
             <!-- 寄语区域 -->
-            <StackPanel>
+            <StackPanel x:Name="MessagePanel">
                 <TextBlock Text="班主任寄语" FontSize="16" FontWeight="SemiBold" Foreground="#FF3498DB" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                 <Border Background="#FF34495E" CornerRadius="10" Padding="15" Margin="0,0,0,20">
                     <TextBlock x:Name="MessageTextBlock" Text="默认寄语：努力学习，天天向上！" FontSize="18" Foreground="#FFFFEB3B" TextWrapping="Wrap" LineHeight="24">
@@ -49,7 +49,7 @@
             </StackPanel>
             
             <!-- 倒计时区域 -->
-            <StackPanel>
+            <StackPanel x:Name="CountdownPanel">
                 <TextBlock Text="倒计时" FontSize="16" FontWeight="SemiBold" Foreground="#FF2ECC71" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                 <Border Background="#FF34495E" CornerRadius="10" Padding="15" Margin="0,0,0,15">
                     <StackPanel>
@@ -60,6 +60,18 @@
                         </TextBlock>
                         <TextBlock x:Name="TargetDateTextBlock" Text="目标日期：未设置" FontSize="14" Foreground="#FF95A5A6" HorizontalAlignment="Center"/>
                     </StackPanel>
+                </Border>
+            </StackPanel>
+            
+            <!-- 备注区域 -->
+            <StackPanel x:Name="RemarkPanel">
+                <TextBlock Text="备注" FontSize="16" FontWeight="SemiBold" Foreground="#FF9B59B6" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <Border Background="#FF34495E" CornerRadius="10" Padding="15" Margin="0,0,0,15">
+                    <TextBlock x:Name="RemarkTextBlock" Text="暂无备注" FontSize="16" Foreground="#FFBDC3C7" TextWrapping="Wrap" LineHeight="22">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="3" Color="#FF000000" Opacity="0.3"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
                 </Border>
             </StackPanel>
             

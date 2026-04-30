@@ -30,17 +30,21 @@ namespace DesktopMessageApp
                     return false;
 
                 string localLastUpdate = GetLocalLastUpdateTime();
+                bool shouldUpdate = false;
                 
                 if (DateTime.TryParse(localLastUpdate, out DateTime localTime))
                 {
                     if (latestSubmission.SubmitTime > localTime)
                     {
-                        await UpdateLocalConfig(latestSubmission);
-                        SaveLastUpdateTime(latestSubmission.SubmitTime.ToString());
-                        return true;
+                        shouldUpdate = true;
                     }
                 }
                 else
+                {
+                    shouldUpdate = true;
+                }
+
+                if (shouldUpdate)
                 {
                     await UpdateLocalConfig(latestSubmission);
                     SaveLastUpdateTime(latestSubmission.SubmitTime.ToString());
@@ -55,7 +59,7 @@ namespace DesktopMessageApp
             }
         }
 
-        private async Task<QuickFormSubmission> GetLatestSubmissionAsync()
+        private async Task<QuickFormSubmission?> GetLatestSubmissionAsync()
         {
             try
             {
@@ -97,34 +101,53 @@ namespace DesktopMessageApp
                     Directory.CreateDirectory(configDir);
                 }
 
-                List<string> configLines = new List<string>();
-                configLines.Add(submission.CountdownName ?? "目标日期");
-                configLines.Add(submission.FontSize ?? "30");
-                configLines.Add(submission.CountdownFontSize ?? "30");
-                configLines.Add(submission.TextAlignment ?? "Center");
+                AppConfig? existingConfig = null;
+                if (File.Exists(_configPath))
+                {
+                    try
+                    {
+                        string existingJson = File.ReadAllText(_configPath);
+                        existingConfig = JsonConvert.DeserializeObject<AppConfig>(existingJson);
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                var newConfig = new AppConfig();
+                
+                if (existingConfig != null)
+                {
+                    newConfig.UseQuickForm = existingConfig.UseQuickForm;
+                    newConfig.ShowMessage = existingConfig.ShowMessage;
+                    newConfig.ShowCountdown = existingConfig.ShowCountdown;
+                    newConfig.ShowRemark = existingConfig.ShowRemark;
+                }
+
+                newConfig.CountdownName = submission.CountdownName ?? "目标日期";
+                newConfig.FontSize = double.TryParse(submission.FontSize, out double fs) ? fs : 18;
+                newConfig.CountdownFontSize = double.TryParse(submission.CountdownFontSize, out double cfs) ? cfs : 20;
+                newConfig.RemarkFontSize = double.TryParse(submission.RemarkFontSize, out double rfs) ? rfs : 16;
+                newConfig.TextAlignment = submission.TextAlignment ?? "Left";
+                newConfig.Remark = submission.Remark ?? "";
 
                 if (!string.IsNullOrEmpty(submission.Messages))
                 {
-                    string[] messages = submission.Messages.Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    configLines.AddRange(messages);
+                    var messages = submission.Messages.Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    newConfig.Messages = new List<string>(messages);
                 }
 
                 if (DateTime.TryParse(submission.TargetDate, out DateTime targetDate))
                 {
-                    configLines.Add(targetDate.ToString());
+                    newConfig.TargetDate = targetDate;
                 }
                 else
                 {
-                    configLines.Add(DateTime.Now.AddDays(30).ToString());
+                    newConfig.TargetDate = DateTime.Now.AddDays(30);
                 }
 
-                using (StreamWriter writer = new StreamWriter(_configPath, false))
-                {
-                    foreach (string line in configLines)
-                    {
-                        writer.WriteLine(line);
-                    }
-                }
+                string json = JsonConvert.SerializeObject(newConfig, Formatting.Indented);
+                File.WriteAllText(_configPath, json);
 
                 await Task.CompletedTask;
             }
@@ -190,30 +213,36 @@ namespace DesktopMessageApp
     public class QuickFormSubmission
     {
         [JsonProperty("messages")]
-        public string Messages { get; set; }
+        public string? Messages { get; set; }
 
         [JsonProperty("countdownName")]
-        public string CountdownName { get; set; }
+        public string? CountdownName { get; set; }
 
         [JsonProperty("targetDate")]
-        public string TargetDate { get; set; }
+        public string? TargetDate { get; set; }
 
         [JsonProperty("submitTime")]
         public DateTime SubmitTime { get; set; }
 
         [JsonProperty("fontSize")]
-        public string FontSize { get; set; }
+        public string? FontSize { get; set; }
 
         [JsonProperty("countdownFontSize")]
-        public string CountdownFontSize { get; set; }
+        public string? CountdownFontSize { get; set; }
+
+        [JsonProperty("remarkFontSize")]
+        public string? RemarkFontSize { get; set; }
 
         [JsonProperty("textAlignment")]
-        public string TextAlignment { get; set; }
+        public string? TextAlignment { get; set; }
+
+        [JsonProperty("remark")]
+        public string? Remark { get; set; }
     }
 
     public class QuickFormApiResponse
     {
         [JsonProperty("submissions")]
-        public List<QuickFormSubmission> Submissions { get; set; }
+        public List<QuickFormSubmission>? Submissions { get; set; }
     }
 }
