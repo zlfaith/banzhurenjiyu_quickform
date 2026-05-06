@@ -74,6 +74,8 @@
         .tab-content {
             padding: 24px;
             display: none;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .tab-content.active {
@@ -313,6 +315,186 @@
             margin-bottom: 16px;
         }
 
+        /* 卡片式数据列表 */
+        .data-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .data-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .data-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .data-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-card-id {
+            font-size: 12px;
+            color: #999;
+            background: #e0e0e0;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .data-card-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .data-card-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .data-card-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .data-card-label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .data-card-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .data-card-content {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .data-card-content-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .data-card-content-text {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            white-space: normal;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            display: block;
+            width: 100%;
+        }
+
+        .data-card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: #4facfe;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #3d9bf5;
+        }
+
+        /* 详情弹窗样式 */
+        .detail-modal .modal {
+            max-width: 600px;
+            width: 95%;
+        }
+
+        .detail-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .detail-value.pre {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .slider-container {
             display: flex;
             align-items: center;
@@ -412,14 +594,51 @@
                 margin-bottom: 10px;
             }
 
-            th, td {
-                padding: 8px 4px;
-                font-size: 12px;
-            }
-
             .btn-small {
                 padding: 4px 8px;
                 font-size: 10px;
+            }
+
+            .data-card {
+                padding: 12px;
+            }
+
+            .data-card-body {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .data-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .data-card-content {
+                padding: 10px;
+            }
+
+            .data-card-content-label {
+                font-size: 11px;
+            }
+
+            .data-card-content-text {
+                font-size: 13px;
+            }
+
+            .detail-modal .modal {
+                padding: 16px;
+                width: 95%;
+            }
+
+            .detail-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .detail-value.pre {
+                font-size: 13px;
+                padding: 10px;
             }
         }
     </style>
@@ -526,29 +745,21 @@
 
         <div class="tab-content" id="query">
             <button class="btn btn-secondary refresh-btn" onclick="loadData()">刷新数据</button>
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>提交时间</th>
-                        <th>倒计时名称</th>
-                        <th>目标日期</th>
-                        <th>寄语字号</th>
-                        <th>倒计时字号</th>
-                        <th>备注字号</th>
-                        <th>对齐方式</th>
-                        <th>寄语预览</th>
-                        <th>备注预览</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableBody">
-                </tbody>
-            </table>
+            <div id="dataCards" class="data-cards"></div>
             <div id="queryStatus" class="status-message"></div>
         </div>
     </div>
 
-    
+    <!-- 详情弹窗 -->
+    <div class="modal-overlay detail-modal" id="detailModal" onclick="closeDetailModal(event)">
+        <div class="modal">
+            <h3>数据详情</h3>
+            <div id="detailContent"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const API_URL = 'https://quickform.cn/api/qvh8vbxcnt';
@@ -641,7 +852,7 @@
                     data.sort((a, b) => new Date(b.submitTime) - new Date(a.submitTime));
                     renderTable(data);
                 } else {
-                    document.getElementById('dataTableBody').innerHTML = '<tr><td colspan="10" class="no-data">暂无数据</td></tr>';
+                    document.getElementById('dataCards').innerHTML = '<div class="no-data">暂无数据</div>';
                 }
             })
             .catch(error => {
@@ -651,31 +862,126 @@
         }
 
         function renderTable(data) {
-            const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = '';
+            const container = document.getElementById('dataCards');
+            container.innerHTML = '';
             
             data.forEach(item => {
-                const row = document.createElement('tr');
-                const preview = item.messages ? item.messages.substring(0, 30) + (item.messages.length > 30 ? '...' : '') : '';
-                const remarkPreview = item.remark ? item.remark.substring(0, 30) + (item.remark.length > 30 ? '...' : '') : '';
+                const card = document.createElement('div');
+                card.className = 'data-card';
+                
                 const time = new Date(item.submitTime).toLocaleString('zh-CN');
                 const alignmentText = getAlignmentText(item.textAlignment);
+                const messagesPreview = item.messages ? item.messages.substring(0, 50) + (item.messages.length > 50 ? '...' : '') : '无';
+                const remarkPreview = item.remark ? item.remark.substring(0, 50) + (item.remark.length > 50 ? '...' : '') : '无';
                 
-                row.innerHTML = `
-                    <td>${item.id || '-'}</td>
-                    <td>${time}</td>
-                    <td>${item.countdownName || '-'}</td>
-                    <td>${item.targetDate || '-'}</td>
-                    <td>${item.fontSize || '18'}</td>
-                    <td>${item.countdownFontSize || '20'}</td>
-                    <td>${item.remarkFontSize || '16'}</td>
-                    <td>${alignmentText}</td>
-                    <td class="data-content" title="${item.messages || ''}">${preview}</td>
-                    <td class="data-content" title="${item.remark || ''}">${remarkPreview}</td>
+                card.innerHTML = `
+                    <div class="data-card-header">
+                        <span class="data-card-id">ID: ${item.id || '-'}</span>
+                        <span class="data-card-time">${time}</span>
+                    </div>
+                    <div class="data-card-body">
+                        <div class="data-card-item">
+                            <span class="data-card-label">倒计时名称</span>
+                            <span class="data-card-value">${item.countdownName || '-'}</span>
+                        </div>
+                        <div class="data-card-item">
+                            <span class="data-card-label">目标日期</span>
+                            <span class="data-card-value">${item.targetDate || '-'}</span>
+                        </div>
+                        <div class="data-card-item">
+                            <span class="data-card-label">寄语字号</span>
+                            <span class="data-card-value">${item.fontSize || '18'}</span>
+                        </div>
+                        <div class="data-card-item">
+                            <span class="data-card-label">倒计时字号</span>
+                            <span class="data-card-value">${item.countdownFontSize || '20'}</span>
+                        </div>
+                        <div class="data-card-item">
+                            <span class="data-card-label">备注字号</span>
+                            <span class="data-card-value">${item.remarkFontSize || '16'}</span>
+                        </div>
+                        <div class="data-card-item">
+                            <span class="data-card-label">对齐方式</span>
+                            <span class="data-card-value">${alignmentText}</span>
+                        </div>
+                    </div>
+                    <div class="data-card-content">
+                        <div class="data-card-content-label">寄语</div>
+                        <div class="data-card-content-text">${messagesPreview}</div>
+                    </div>
+                    <div class="data-card-content">
+                        <div class="data-card-content-label">备注</div>
+                        <div class="data-card-content-text">${remarkPreview}</div>
+                    </div>
+                    <div class="data-card-actions">
+                        <button class="btn-small btn-view" onclick='showDetail(${JSON.stringify(item).replace(/'/g, "&#39;")})'>查看详情</button>
+                    </div>
                 `;
                 
-                tbody.appendChild(row);
+                container.appendChild(card);
             });
+        }
+
+        function showDetail(item) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            const time = new Date(item.submitTime).toLocaleString('zh-CN');
+            const alignmentText = getAlignmentText(item.textAlignment);
+            
+            content.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-grid">
+                        <div>
+                            <div class="detail-label">ID</div>
+                            <div class="detail-value">${item.id || '-'}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">提交时间</div>
+                            <div class="detail-value">${time}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">倒计时名称</div>
+                            <div class="detail-value">${item.countdownName || '-'}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">目标日期</div>
+                            <div class="detail-value">${item.targetDate || '-'}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">寄语字号</div>
+                            <div class="detail-value">${item.fontSize || '18'}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">倒计时字号</div>
+                            <div class="detail-value">${item.countdownFontSize || '20'}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">备注字号</div>
+                            <div class="detail-value">${item.remarkFontSize || '16'}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">对齐方式</div>
+                            <div class="detail-value">${alignmentText}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">寄语</div>
+                    <div class="detail-value pre">${item.messages || '无'}</div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">备注</div>
+                    <div class="detail-value pre">${item.remark || '无'}</div>
+                </div>
+            `;
+            
+            modal.classList.add('show');
+        }
+
+        function closeDetailModal(event) {
+            if (!event || event.target === document.getElementById('detailModal')) {
+                document.getElementById('detailModal').classList.remove('show');
+            }
         }
 
         function getAlignmentText(alignment) {
@@ -704,22 +1010,58 @@
         }
 
         function loadDefaultData() {
-            const defaultMessages = `把每一件小事做好，把每一个知识点扎实，优秀自然会来找你。
-青春没有捷径，每一步努力，都在为未来铺路。
-愿你眼里有光，心中有爱，脚下有路，做温暖而坚定的少年。
-不怕起点低，就怕不努力；不怕暂时落后，就怕轻言放弃。
-课堂认真一分，收获多十分；自律多一点，成长快一步。
-心怀梦想，脚踏实地，在最好的年纪，做最努力的自己。`;
+            const btn = document.querySelector('button[onclick="loadDefaultData()"]');
+            const originalText = btn.textContent;
+            btn.textContent = '加载中...';
+            btn.disabled = true;
 
-            document.getElementById('messages').value = defaultMessages;
-            document.getElementById('countdownName').value = '生物地理结业考试';
-            document.getElementById('targetDate').value = '2026-06-15';
-            document.getElementById('fontSize').value = '30';
-            document.getElementById('fontSizeValue').textContent = '30';
-            document.getElementById('countdownFontSize').value = '30';
-            document.getElementById('countdownFontSizeValue').textContent = '30';
-            document.querySelector('input[name="textAlignment"][value="Center"]').checked = true;
-            showStatus('submitStatus', '已加载示例数据', 'success');
+            fetch(API_URL + '/all')
+                .then(response => response.json())
+                .then(data => {
+                    let submissions = [];
+                    if (data && data.submissions && Array.isArray(data.submissions)) {
+                        submissions = data.submissions;
+                    } else if (Array.isArray(data)) {
+                        submissions = data;
+                    }
+
+                    if (submissions.length === 0) {
+                        showStatus('submitStatus', '云端暂无数据', 'error');
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    submissions.sort((a, b) => new Date(b.submitTime) - new Date(a.submitTime));
+                    const latest = submissions[0];
+
+                    document.getElementById('messages').value = latest.messages || '';
+                    document.getElementById('countdownName').value = latest.countdownName || '';
+                    document.getElementById('targetDate').value = latest.targetDate || '';
+                    document.getElementById('fontSize').value = latest.fontSize || '30';
+                    document.getElementById('fontSizeValue').textContent = latest.fontSize || '30';
+                    document.getElementById('countdownFontSize').value = latest.countdownFontSize || '30';
+                    document.getElementById('countdownFontSizeValue').textContent = latest.countdownFontSize || '30';
+                    document.getElementById('remarkFontSize').value = latest.remarkFontSize || '16';
+                    document.getElementById('remarkFontSizeValue').textContent = latest.remarkFontSize || '16';
+                    document.getElementById('remark').value = latest.remark || '';
+
+                    const alignment = latest.textAlignment || 'Center';
+                    const alignmentRadio = document.querySelector('input[name="textAlignment"][value="' + alignment + '"]');
+                    if (alignmentRadio) {
+                        alignmentRadio.checked = true;
+                    }
+
+                    showStatus('submitStatus', '已加载云端最新数据', 'success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showStatus('submitStatus', '加载云端数据失败，请检查网络', 'error');
+                })
+                .finally(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                });
         }
 
         function showStatus(elementId, message, type) {
